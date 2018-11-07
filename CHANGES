@@ -2,6 +2,8 @@ Changelog for Mojolicious-Plugin-Export
 
 {{ $NEXT }}
 
+0.001     2018-11-07 17:24:19-06:00 America/Chicago
+
     [Added]
 
     - Added ability to export a Mojolicious site to static files
