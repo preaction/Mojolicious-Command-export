@@ -1,0 +1,41 @@
+[![Build Status](https://travis-ci.org/preaction/Mojolicious-Command-export.svg?branch=master)](https://travis-ci.org/preaction/Mojolicious-Command-export)
+[![Coverage Status](https://coveralls.io/repos/preaction/Mojolicious-Command-export/badge.svg?branch=master)](https://coveralls.io/r/preaction/Mojolicious-Command-export?branch=master)
+
+# NAME
+
+Mojolicious::Command::export - Export a Mojolicious website to static files
+
+# VERSION
+
+version 0.001
+
+# SYNOPSIS
+
+    Usage: APPLICATION export [OPTIONS] [PAGES]
+
+      ./myapp.pl export
+      ./myapp.pl export /perldoc --to /var/www/html
+
+    Options:
+      -h, --help        Show this summary of available options
+          --to          Path to store the static pages. Defaults to '.'.
+      -q, --quiet       Silence report of dirs/files modified
+
+# DESCRIPTION
+
+Export a Mojolicious webapp to static files.
+
+# SEE ALSO
+
+[Mojolicious](https://metacpan.org/pod/Mojolicious), [Mojolicious::Commands](https://metacpan.org/pod/Mojolicious::Commands)
+
+# AUTHOR
+
+Doug Bell <preaction@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Doug Bell.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
