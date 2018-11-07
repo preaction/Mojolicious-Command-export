@@ -25,7 +25,7 @@ L<Mojolicious>, L<Mojolicious::Commands>
 
 use Mojo::Base 'Mojolicious::Command';
 use Mojo::File qw( path );
-use Getopt::Long qw( GetOptionsFromArray );
+use Mojo::Util qw( getopt );
 
 has description => 'Export site to static files';
 has usage => sub { shift->extract_usage };
@@ -35,7 +35,7 @@ sub run {
     my %opt = (
         to => '.',
     );
-    GetOptionsFromArray( \@args, \%opt,
+    getopt( \@args, \%opt,
         'to=s',
     );
     my $root = path( $opt{ to } );
@@ -66,8 +66,7 @@ sub run {
         if ( $to !~ m{[.][^/.]+$} ) {
             $to = $to->child( 'index.html' );
         }
-        $to->dirname->make_path;
-        $to->spurt( $tx->res->body );
+        $self->write_file( $to, $tx->res->body )
     }
 }
 
