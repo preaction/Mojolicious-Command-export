@@ -12,6 +12,7 @@ our $VERSION = '0.001';
   Options:
     -h, --help        Show this summary of available options
         --to          Path to store the static pages. Defaults to '.'.
+    -q, --quiet       Silence report of dirs/files modified
 
 =head1 DESCRIPTION
 
@@ -37,7 +38,9 @@ sub run {
     );
     getopt( \@args, \%opt,
         'to=s',
+        'quiet|q' => sub { $self->quiet( 1 ) },
     );
+
     my $root = path( $opt{ to } );
     my @pages = @args ? map { m{^/} ? $_ : "/$_" } @args : ( '/' );
 

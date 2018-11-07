@@ -27,6 +27,7 @@ $app->routes->get( '/about' )->name( 'about' );
 
 my $cmd = Mojolicious::Command::export->new(
     app => $app,
+    quiet => 1,
 );
 
 my $dom;
