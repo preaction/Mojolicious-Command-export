@@ -4,7 +4,14 @@ our $VERSION = '0.001';
 
 =head1 SYNOPSIS
 
-    ./myapp.pl export [--to <dir>] [<path>...]
+  Usage: APPLICATION export [OPTIONS] [PAGES]
+
+    ./myapp.pl export
+    ./myapp.pl export /perldoc --to /var/www/html
+
+  Options:
+    -h, --help        Show this summary of available options
+        --to          Path to store the static pages. Defaults to '.'.
 
 =head1 DESCRIPTION
 
@@ -19,6 +26,9 @@ L<Mojolicious>, L<Mojolicious::Commands>
 use Mojo::Base 'Mojolicious::Command';
 use Mojo::File qw( path );
 use Getopt::Long qw( GetOptionsFromArray );
+
+has description => 'Export site to static files';
+has usage => sub { shift->extract_usage };
 
 sub run {
     my ( $self, @args ) = @_;
