@@ -115,6 +115,10 @@ sub run {
         if ( $to !~ m{[.][^/.]+$} ) {
             $to = $to->child( 'index.html' );
         }
+        if ( -e $to ) {
+            say "  [delet] $to" unless $self->quiet;
+            unlink $to;
+        }
         $self->write_file( $to, $content );
     }
 }

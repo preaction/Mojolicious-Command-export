@@ -59,6 +59,12 @@ ok $tmp->child( 'logo-white-2x.png' )->slurp eq $app->static->file( 'logo-white-
 ok !-e $tmp->child( 'http' ), 'full urls are not exported';
 ok !-e $tmp->child( 'cdnjs.org' ), 'full urls (no scheme) are not exported';
 
+# Second export rewrites files
+$tmp->child( 'index.html' )->spurt( '<h1>DESTROYED</h1>' );
+$cmd->run( '/' ); # Export root
+$dom = Mojo::DOM->new( $tmp->child( 'index.html' )->slurp );
+is $dom->at( 'h1' ), '<h1>Export</h1>', 'root content is correct';
+
 chdir $home;
 $tmp = tempdir;
 chdir $tmp;
