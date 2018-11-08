@@ -18,6 +18,21 @@ our $VERSION = '0.002';
 
 Export a Mojolicious webapp to static files.
 
+=head2 Configuration
+
+Default values for the command's options can be specified in the
+configuration using one of Mojolicious's configuration plugins.
+
+    # myapp.conf
+    {
+        export => {
+            # Configure the default paths to export
+            paths => [ '/', '/hidden' ],
+            # The directory to export to
+            to => '/var/www/html',
+        }
+    }
+
 =head1 SEE ALSO
 
 L<Mojolicious>, L<Mojolicious::Commands>
@@ -33,8 +48,10 @@ has usage => sub { shift->extract_usage };
 
 sub run {
     my ( $self, @args ) = @_;
+    my $app = $self->app;
+    my $config = $app->can( 'config' ) ? $app->config->{export} : {};
     my %opt = (
-        to => '.',
+        to => $config->{to} // '.',
     );
     getopt( \@args, \%opt,
         'to=s',
@@ -42,7 +59,10 @@ sub run {
     );
 
     my $root = path( $opt{ to } );
-    my @pages = @args ? map { m{^/} ? $_ : "/$_" } @args : ( '/' );
+    my @pages
+        = @args ? map { m{^/} ? $_ : "/$_" } @args
+        : $config->{pages} ? @{ $config->{pages} }
+        : ( '/' );
 
     my $ua = Mojo::UserAgent->new;
     $ua->server->app( $self->app );

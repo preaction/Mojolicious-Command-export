@@ -87,6 +87,22 @@ ok -e $tmp_to->child( 'docs/index.html' ), '/docs exists (absolute link)';
 ok -e $tmp_to->child( 'about/index.html' ), '/about exists (relative link)';
 ok -e $tmp_to->child( 'logo-white-2x.png' ), 'image is exported';
 
+# Test default settings from config
+my $config_to = tempdir;
+my %config = (
+    export => {
+        pages => [ '/docs' ],
+        to => "$config_to",
+    },
+);
+$app->plugin( Config => { default => \%config } );
+$cmd->run();
+ok !-e $config_to->child( 'index.html' ), 'root does not exist';
+ok -e $config_to->child( 'docs/index.html' ), '/docs exists (page requested)';
+ok -e $config_to->child( 'docs/more/index.html' ), '/docs/more exists (link on page)';
+ok !-e $config_to->child( 'about/index.html' ), '/about does not exist';
+ok !-e $config_to->child( 'logo-white-2x.png' ), 'image is not exported';
+
 done_testing;
 
 __DATA__
