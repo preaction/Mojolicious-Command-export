@@ -58,6 +58,7 @@ ok $tmp->child( 'logo-white-2x.png' )->slurp eq $app->static->file( 'logo-white-
 
 ok !-e $tmp->child( 'http' ), 'full urls are not exported';
 ok !-e $tmp->child( 'cdnjs.org' ), 'full urls (no scheme) are not exported';
+ok !-e $tmp->child( 'NOT_FOUND' ), 'error responses are not exported';
 
 # Second export rewrites files
 $tmp->child( 'index.html' )->spurt( '<h1>DESTROYED</h1>' );
@@ -146,6 +147,7 @@ __DATA__
 <a href="http://mojolicious.org"><img src="logo-white-2x.png"></a>
 <a href="/docs">Absolute</a>
 <a href="about">Relative</a>
+<a href="NOT_FOUND">Not found</a>
 
 @@ docs.html.ep
 <h1>Docs</h1>

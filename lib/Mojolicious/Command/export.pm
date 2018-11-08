@@ -83,8 +83,17 @@ sub run {
         $exported{ $page }++;
         my $tx = $ua->get( $page );
         my $res = $tx->res;
-        my $type = $res->headers->content_type;
 
+        # Do not try to write error messages
+        if ( $res->is_error ) {
+            if ( !$self->quiet ) {
+                say sprintf "  [ERROR] %s - %s %s",
+                    $page, $res->code, $res->message;
+            }
+            next;
+        }
+
+        my $type = $res->headers->content_type;
         my $content = $tx->res->body;
         if ( $type and $type =~ m{^text/html} and my $dom = $res->dom ) {
             my $dir = path( $page )->dirname;
