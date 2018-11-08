@@ -79,6 +79,28 @@ ok -e $tmp->child( 'docs', 'more', 'index.html' ), '/docs/more exists (link on p
 ok !-e $tmp->child( 'about', 'index.html' ), '/about does not exist';
 ok !-e $tmp->child( 'logo-white-2x.png' ), 'image is not exported';
 
+# Test URL rewriting
+chdir $home;
+$tmp = tempdir;
+chdir $tmp;
+$cmd->run( '--base', '/base', '/' );
+ok -e $tmp->child( 'index.html' ), 'root exists';
+$dom = Mojo::DOM->new( $tmp->child( 'index.html' )->slurp );
+ok $dom->at( 'a[href=/base/docs]' ), 'absolute url (/docs) on / is rewritten';
+ok $dom->at( 'a[href=about]' ), 'relative url (about) on / is not rewritten';
+
+ok -e $tmp->child( 'docs', 'index.html' ), '/docs exists (absolute link)';
+$dom = Mojo::DOM->new( $tmp->child( 'docs', 'index.html' )->slurp );
+ok $dom->at( 'a[href=/base/docs/more]' ), 'absolute url (/docs/more) on /docs is rewritten'
+    or diag $dom;
+
+ok -e $tmp->child( 'about', 'index.html' ), '/about exists (relative link)';
+$dom = Mojo::DOM->new( $tmp->child( 'about', 'index.html' )->slurp );
+ok $dom->at( 'a[href=/base]' ), 'absolute url (/) on /about is rewritten';
+
+ok -e $tmp->child( 'docs', 'more', 'index.html' ), '/docs/more exists (relative link)';
+ok -e $tmp->child( 'logo-white-2x.png' ), 'image is exported';
+
 chdir $home;
 my $tmp_to = tempdir;
 $cmd->run( '--to', $tmp_to );
@@ -93,12 +115,16 @@ my %config = (
     export => {
         pages => [ '/docs' ],
         to => "$config_to",
+        base => '/base',
     },
 );
 $app->plugin( Config => { default => \%config } );
 $cmd->run();
 ok !-e $config_to->child( 'index.html' ), 'root does not exist';
 ok -e $config_to->child( 'docs', 'index.html' ), '/docs exists (page requested)';
+$dom = Mojo::DOM->new( $config_to->child( 'docs', 'index.html' )->slurp );
+ok $dom->at( 'a[href=/base/docs/more]' ), 'absolute url is rewritten'
+    or diag $dom;
 ok -e $config_to->child( 'docs', 'more', 'index.html' ), '/docs/more exists (link on page)';
 ok !-e $config_to->child( 'about', 'index.html' ), '/about does not exist';
 ok !-e $config_to->child( 'logo-white-2x.png' ), 'image is not exported';

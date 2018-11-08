@@ -8,10 +8,12 @@ our $VERSION = '0.002';
 
     ./myapp.pl export
     ./myapp.pl export /perldoc --to /var/www/html
+    ./myapp.pl export /perldoc --base /url
 
   Options:
     -h, --help        Show this summary of available options
         --to          Path to store the static pages. Defaults to '.'.
+        --base <url>  Rewrite internal absolute links to prepend base
     -q, --quiet       Silence report of dirs/files modified
 
 =head1 DESCRIPTION
@@ -30,6 +32,8 @@ configuration using one of Mojolicious's configuration plugins.
             paths => [ '/', '/hidden' ],
             # The directory to export to
             to => '/var/www/html',
+            # Rewrite URLs to include base directory
+            base => '/',
         }
     }
 
@@ -52,11 +56,17 @@ sub run {
     my $config = $app->can( 'config' ) ? $app->config->{export} : {};
     my %opt = (
         to => $config->{to} // '.',
+        base => $config->{base} // '',
     );
     getopt( \@args, \%opt,
         'to=s',
+        'base=s',
         'quiet|q' => sub { $self->quiet( 1 ) },
     );
+
+    if ( $opt{base} =~ m{^[^/]} ) {
+        $opt{base} = '/' . $opt{base};
+    }
 
     my $root = path( $opt{ to } );
     my @pages
@@ -74,22 +84,38 @@ sub run {
         my $tx = $ua->get( $page );
         my $res = $tx->res;
         my $type = $res->headers->content_type;
+
+        my $content = $tx->res->body;
         if ( $type and $type =~ m{^text/html} and my $dom = $res->dom ) {
             my $dir = path( $page )->dirname;
-            push @pages,
-                grep { !$exported{ $_ } } # Prune duplicates
-                map { m{^/} ? $_ : $dir->child( $_ )."" } # Fix relative URLs
-                grep { !m{^(?:[a-zA-Z]+:)?//} } # Not full URLs
-                $dom->find( '[href]' )->map( attr => 'href' )->each,
-                $dom->find( '[src]' )->map( attr => 'src' )->each,
-                ;
+            for my $attr ( qw( href src ) ) {
+                for my $el ( $dom->find( "[$attr]" )->each ) {
+                    my $url = $el->attr( $attr );
+
+                    # Don't analyze full URLs
+                    next if $url =~ m{^(?:[a-zA-Z]+:)?//};
+
+                    # Fix relative paths
+                    my $path = $url =~ m{^/} ? $url : $dir->child( $url )."";
+                    if ( !$exported{ $path } ) { # Prune duplicates
+                        push @pages, $path;
+                    }
+
+                    # Rewrite absolute paths
+                    if ( $opt{base} && $url =~ m{^/} ) {
+                        my $base_url = $url eq '/' ? $opt{base} : $opt{base} . $url;
+                        $el->attr( $attr => $base_url );
+                    }
+                }
+            }
+            $content = $dom;
         }
 
         my $to = $root->child( $page );
         if ( $to !~ m{[.][^/.]+$} ) {
             $to = $to->child( 'index.html' );
         }
-        $self->write_file( $to, $tx->res->body )
+        $self->write_file( $to, $content );
     }
 }
 
