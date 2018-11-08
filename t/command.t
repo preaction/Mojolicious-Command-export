@@ -40,16 +40,16 @@ ok -e $tmp->child( 'index.html' ), 'root exists';
 $dom = Mojo::DOM->new( $tmp->child( 'index.html' )->slurp );
 is $dom->at( 'h1' ), '<h1>Export</h1>', 'root content is correct';
 
-ok -e $tmp->child( 'docs/index.html' ), '/docs exists (absolute link)';
-$dom = Mojo::DOM->new( $tmp->child( 'docs/index.html' )->slurp );
+ok -e $tmp->child( 'docs', 'index.html' ), '/docs exists (absolute link)';
+$dom = Mojo::DOM->new( $tmp->child( 'docs', 'index.html' )->slurp );
 is $dom->at( 'h1' ), '<h1>Docs</h1>', '/docs content is correct';
 
-ok -e $tmp->child( 'docs/more/index.html' ), '/docs/more exists (relative link)';
-$dom = Mojo::DOM->new( $tmp->child( 'docs/more/index.html' )->slurp );
+ok -e $tmp->child( 'docs', 'more', 'index.html' ), '/docs/more exists (relative link)';
+$dom = Mojo::DOM->new( $tmp->child( 'docs', 'more', 'index.html' )->slurp );
 is $dom->at( 'h1' ), '<h1>More Docs</h1>', '/docs/more content is correct';
 
-ok -e $tmp->child( 'about/index.html' ), '/about exists (relative link)';
-$dom = Mojo::DOM->new( $tmp->child( 'about/index.html' )->slurp );
+ok -e $tmp->child( 'about', 'index.html' ), '/about exists (relative link)';
+$dom = Mojo::DOM->new( $tmp->child( 'about', 'index.html' )->slurp );
 is $dom->at( 'h1' ), '<h1>About</h1>', '/about content is correct';
 
 ok -e $tmp->child( 'logo-white-2x.png' ), 'image is exported';
@@ -64,9 +64,9 @@ $tmp = tempdir;
 chdir $tmp;
 $cmd->run(); # Export root by default
 ok -e $tmp->child( 'index.html' ), 'root exists';
-ok -e $tmp->child( 'docs/index.html' ), '/docs exists (absolute link)';
-ok -e $tmp->child( 'docs/more/index.html' ), '/docs/more exists (relative link)';
-ok -e $tmp->child( 'about/index.html' ), '/about exists (relative link)';
+ok -e $tmp->child( 'docs', 'index.html' ), '/docs exists (absolute link)';
+ok -e $tmp->child( 'docs', 'more', 'index.html' ), '/docs/more exists (relative link)';
+ok -e $tmp->child( 'about', 'index.html' ), '/about exists (relative link)';
 ok -e $tmp->child( 'logo-white-2x.png' ), 'image is exported';
 
 chdir $home;
@@ -74,17 +74,17 @@ $tmp = tempdir;
 chdir $tmp;
 $cmd->run( '/docs' ); # Only export /docs
 ok !-e $tmp->child( 'index.html' ), 'root does not exist';
-ok -e $tmp->child( 'docs/index.html' ), '/docs exists (page requested)';
-ok -e $tmp->child( 'docs/more/index.html' ), '/docs/more exists (link on page)';
-ok !-e $tmp->child( 'about/index.html' ), '/about does not exist';
+ok -e $tmp->child( 'docs', 'index.html' ), '/docs exists (page requested)';
+ok -e $tmp->child( 'docs', 'more', 'index.html' ), '/docs/more exists (link on page)';
+ok !-e $tmp->child( 'about', 'index.html' ), '/about does not exist';
 ok !-e $tmp->child( 'logo-white-2x.png' ), 'image is not exported';
 
 chdir $home;
 my $tmp_to = tempdir;
 $cmd->run( '--to', $tmp_to );
 ok -e $tmp_to->child( 'index.html' ), 'root exists';
-ok -e $tmp_to->child( 'docs/index.html' ), '/docs exists (absolute link)';
-ok -e $tmp_to->child( 'about/index.html' ), '/about exists (relative link)';
+ok -e $tmp_to->child( 'docs', 'index.html' ), '/docs exists (absolute link)';
+ok -e $tmp_to->child( 'about', 'index.html' ), '/about exists (relative link)';
 ok -e $tmp_to->child( 'logo-white-2x.png' ), 'image is exported';
 
 # Test default settings from config
@@ -98,9 +98,9 @@ my %config = (
 $app->plugin( Config => { default => \%config } );
 $cmd->run();
 ok !-e $config_to->child( 'index.html' ), 'root does not exist';
-ok -e $config_to->child( 'docs/index.html' ), '/docs exists (page requested)';
-ok -e $config_to->child( 'docs/more/index.html' ), '/docs/more exists (link on page)';
-ok !-e $config_to->child( 'about/index.html' ), '/about does not exist';
+ok -e $config_to->child( 'docs', 'index.html' ), '/docs exists (page requested)';
+ok -e $config_to->child( 'docs', 'more', 'index.html' ), '/docs/more exists (link on page)';
+ok !-e $config_to->child( 'about', 'index.html' ), '/about does not exist';
 ok !-e $config_to->child( 'logo-white-2x.png' ), 'image is not exported';
 
 done_testing;
