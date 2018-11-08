@@ -12,7 +12,7 @@ our $VERSION = '0.002';
 
   Options:
     -h, --help        Show this summary of available options
-        --to          Path to store the static pages. Defaults to '.'.
+        --to <path>   Path to store the static pages. Defaults to '.'.
         --base <url>  Rewrite internal absolute links to prepend base
     -q, --quiet       Silence report of dirs/files modified
 
