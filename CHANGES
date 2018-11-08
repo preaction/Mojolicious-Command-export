@@ -2,6 +2,8 @@ Changelog for Mojolicious-Plugin-Export
 
 {{ $NEXT }}
 
+0.002     2018-11-08 11:44:01-06:00 America/Chicago
+
     [Added]
 
     - Added `export` configuration to Mojolicious app. Now you can
