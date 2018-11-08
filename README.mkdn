@@ -7,7 +7,7 @@ Mojolicious::Command::export - Export a Mojolicious website to static files
 
 # VERSION
 
-version 0.001
+version 0.002
 
 # SYNOPSIS
 
@@ -15,15 +15,34 @@ version 0.001
 
       ./myapp.pl export
       ./myapp.pl export /perldoc --to /var/www/html
+      ./myapp.pl export /perldoc --base /url
 
     Options:
       -h, --help        Show this summary of available options
-          --to          Path to store the static pages. Defaults to '.'.
+          --to <path>   Path to store the static pages. Defaults to '.'.
+          --base <url>  Rewrite internal absolute links to prepend base
       -q, --quiet       Silence report of dirs/files modified
 
 # DESCRIPTION
 
 Export a Mojolicious webapp to static files.
+
+## Configuration
+
+Default values for the command's options can be specified in the
+configuration using one of Mojolicious's configuration plugins.
+
+    # myapp.conf
+    {
+        export => {
+            # Configure the default paths to export
+            paths => [ '/', '/hidden' ],
+            # The directory to export to
+            to => '/var/www/html',
+            # Rewrite URLs to include base directory
+            base => '/',
+        }
+    }
 
 # SEE ALSO
 

@@ -2,6 +2,21 @@ Changelog for Mojolicious-Plugin-Export
 
 {{ $NEXT }}
 
+    [Added]
+
+    - Added `export` configuration to Mojolicious app. Now you can
+      configure the default export settings directly in your
+      application.
+    - Added `--base <url>` to rewrite absolute URLs. This helps when
+      deploying a site to a folder in a larger site.
+
+    [Fixed]
+
+    - Fixed pages not being updated if they already exist in the export
+      directory.
+    - Fixed accidental export of error pages. Error pages aren't useful
+      to export...
+
 0.001     2018-11-07 17:24:19-06:00 America/Chicago
 
     [Added]
