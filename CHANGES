@@ -2,6 +2,8 @@ Changelog for Mojolicious-Plugin-Export
 
 {{ $NEXT }}
 
+0.003     2018-11-08 21:39:27-06:00 America/Chicago
+
     [Added]
 
     - Added resolving of redirects and replacing links. Now if one of
