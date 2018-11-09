@@ -45,7 +45,7 @@ L<Mojolicious>, L<Mojolicious::Commands>
 
 use Mojo::Base 'Mojolicious::Command';
 use Mojo::File qw( path );
-use Mojo::Util qw( getopt );
+use Mojo::Util qw( getopt encode decode );
 
 has description => 'Export site to static files';
 has usage => sub { shift->extract_usage };

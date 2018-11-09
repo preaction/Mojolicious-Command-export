@@ -22,7 +22,12 @@ unshift @{$app->static->classes}, 'main';
 $app->static->warmup;
 $app->routes->get( '/' )->name( 'index' );
 $app->routes->get( '/docs' )->name( 'docs' );
-$app->routes->get( '/docs/more' )->name( 'docs/more' );
+$app->routes->get( '/docs/more' )->name( 'docs/more' )->to( cb => sub {
+    # UTF-8 encoding is busted. Need to examine encoding from
+    # content-type and decode/encode to destination type
+    #shift->render( inline => "<h1>\x{2603}</h1>" )
+    shift->render( inline => '<h1>More Docs</h1>' );
+});
 $app->routes->get( '/about' )->name( 'about' );
 $app->routes->get( '/redirect' )->to( cb => sub {
     shift->redirect_to( 'http://example.com' )
@@ -52,7 +57,7 @@ is $dom->at( 'h1' ), '<h1>Docs</h1>', '/docs content is correct';
 
 ok -e $tmp->child( 'docs', 'more', 'index.html' ), '/docs/more exists (relative link)';
 $dom = Mojo::DOM->new( $tmp->child( 'docs', 'more', 'index.html' )->slurp );
-is $dom->at( 'h1' ), '<h1>More Docs</h1>', '/docs/more content is correct';
+is $dom->at( 'h1' ), "<h1>More Docs</h1>", '/docs/more content is correct';
 
 ok -e $tmp->child( 'about', 'index.html' ), '/about exists (relative link)';
 $dom = Mojo::DOM->new( $tmp->child( 'about', 'index.html' )->slurp );
@@ -162,9 +167,6 @@ __DATA__
 @@ docs.html.ep
 <h1>Docs</h1>
 <a href="/docs/more">More Docs</a>
-
-@@ docs/more.html.ep
-<h1>More Docs</h1>
 
 @@ about.html.ep
 <h1>About</h1>
