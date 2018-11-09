@@ -77,18 +77,37 @@ sub run {
     my $ua = Mojo::UserAgent->new;
     $ua->server->app( $self->app );
 
-    my %exported;
+    # A hash of path => knowledge about the path
+    #   link_from => a hash of path -> array of DOM elements linking to original path
+    #   res => The response from the request for this page
+    #   redirect_to => The redirect location, if it was a redirect
+    my %history;
+
     while ( my $page = shift @pages ) {
-        next if $exported{ $page };
-        $exported{ $page }++;
+        next if $history{ $page }{ res };
         my $tx = $ua->get( $page );
-        my $res = $tx->res;
+        my $res = $history{ $page }{ res } = $tx->res;
 
         # Do not try to write error messages
         if ( $res->is_error ) {
             if ( !$self->quiet ) {
                 say sprintf "  [ERROR] %s - %s %s",
                     $page, $res->code, $res->message;
+            }
+            next;
+        }
+
+        # Rewrite links to redirects
+        if ( $res->is_redirect ) {
+            my $loc = $history{ $page }{ redirect_to } = $res->headers->location;
+            say "  [redir] Found redirect. Fixing links to this page"
+                unless $self->quiet;
+            for my $link_from ( keys %{ $history{ $page }{ link_from } } ) {
+                for my $el ( @{ $history{ $page }{ link_from }{ $link_from } } ) {
+                    $el->attr( href => $loc );
+                }
+                my $content = $history{ $link_from }{ res }->dom;
+                $self->_write( $root, $link_from, $content );
             }
             next;
         }
@@ -106,7 +125,15 @@ sub run {
 
                     # Fix relative paths
                     my $path = $url =~ m{^/} ? $url : $dir->child( $url )."";
-                    if ( !$exported{ $path } ) { # Prune duplicates
+                    if ( my $loc = $history{ $path }{ redirect_to } ) {
+                        $el->attr( $attr => $loc );
+                        next;
+                    }
+                    else {
+                        push @{ $history{ $path }{ link_from }{ $page } }, $el;
+                    }
+
+                    if ( !$history{ $path }{ res } ) {
                         push @pages, $path;
                     }
 
@@ -120,16 +147,21 @@ sub run {
             $content = $dom;
         }
 
-        my $to = $root->child( $page );
-        if ( $to !~ m{[.][^/.]+$} ) {
-            $to = $to->child( 'index.html' );
-        }
-        if ( -e $to ) {
-            say "  [delet] $to" unless $self->quiet;
-            unlink $to;
-        }
-        $self->write_file( $to, $content );
+        $self->_write( $root, $page, $content );
     }
+}
+
+sub _write {
+    my ( $self, $root, $page, $content ) = @_;
+    my $to = $root->child( $page );
+    if ( $to !~ m{[.][^/.]+$} ) {
+        $to = $to->child( 'index.html' );
+    }
+    if ( -e $to ) {
+        say "  [delet] $to" unless $self->quiet;
+        unlink $to;
+    }
+    $self->write_file( $to, $content );
 }
 
 1;

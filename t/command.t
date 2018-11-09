@@ -24,6 +24,9 @@ $app->routes->get( '/' )->name( 'index' );
 $app->routes->get( '/docs' )->name( 'docs' );
 $app->routes->get( '/docs/more' )->name( 'docs/more' );
 $app->routes->get( '/about' )->name( 'about' );
+$app->routes->get( '/redirect' )->to( cb => sub {
+    shift->redirect_to( 'http://example.com' )
+});
 
 my $cmd = Mojolicious::Command::export->new(
     app => $app,
@@ -39,6 +42,9 @@ $cmd->run( '/' ); # Export root
 ok -e $tmp->child( 'index.html' ), 'root exists';
 $dom = Mojo::DOM->new( $tmp->child( 'index.html' )->slurp );
 is $dom->at( 'h1' ), '<h1>Export</h1>', 'root content is correct';
+ok $dom->at( 'a[href="http://example.com"]' ),
+    'link replaced with redirect location'
+        or diag $dom;
 
 ok -e $tmp->child( 'docs', 'index.html' ), '/docs exists (absolute link)';
 $dom = Mojo::DOM->new( $tmp->child( 'docs', 'index.html' )->slurp );
@@ -59,6 +65,7 @@ ok $tmp->child( 'logo-white-2x.png' )->slurp eq $app->static->file( 'logo-white-
 ok !-e $tmp->child( 'http' ), 'full urls are not exported';
 ok !-e $tmp->child( 'cdnjs.org' ), 'full urls (no scheme) are not exported';
 ok !-e $tmp->child( 'NOT_FOUND' ), 'error responses are not exported';
+ok !-e $tmp->child( 'redirect' ), 'redirect responses are not exported';
 
 # Second export rewrites files
 $tmp->child( 'index.html' )->spurt( '<h1>DESTROYED</h1>' );
@@ -148,6 +155,7 @@ __DATA__
 <a href="/docs">Absolute</a>
 <a href="about">Relative</a>
 <a href="NOT_FOUND">Not found</a>
+<a href="/redirect">Redirect</a>
 
 @@ docs.html.ep
 <h1>Docs</h1>
