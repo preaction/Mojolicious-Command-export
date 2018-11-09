@@ -122,6 +122,8 @@ sub run {
 
                     # Don't analyze full URLs
                     next if $url =~ m{^(?:[a-zA-Z]+:)?//};
+                    # Don't analyze in-page fragments
+                    next if $url =~ m{^#};
 
                     # Fix relative paths
                     my $path = $url =~ m{^/} ? $url : $dir->child( $url )."";

@@ -66,6 +66,7 @@ ok !-e $tmp->child( 'http' ), 'full urls are not exported';
 ok !-e $tmp->child( 'cdnjs.org' ), 'full urls (no scheme) are not exported';
 ok !-e $tmp->child( 'NOT_FOUND' ), 'error responses are not exported';
 ok !-e $tmp->child( 'redirect' ), 'redirect responses are not exported';
+ok !-e $tmp->child( '#foo' ), 'fragments are not exported';
 
 # Second export rewrites files
 $tmp->child( 'index.html' )->spurt( '<h1>DESTROYED</h1>' );
@@ -156,6 +157,7 @@ __DATA__
 <a href="about#foo">Relative</a>
 <a href="NOT_FOUND">Not found</a>
 <a href="/redirect">Redirect</a>
+<a href="#foo">Fragment</a>
 
 @@ docs.html.ep
 <h1>Docs</h1>
