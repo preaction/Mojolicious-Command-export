@@ -2,6 +2,16 @@ Changelog for Mojolicious-Plugin-Export
 
 {{ $NEXT }}
 
+    [Added]
+
+    - Added resolving of redirects and replacing links. Now if one of
+      your routes redirects to another route, all the links in your site
+      will be fixed appropriately.
+
+    [Fixed]
+
+    - Fixed exporting pages with URL fragments in the path
+
 0.002     2018-11-08 11:44:01-06:00 America/Chicago
 
     [Added]
