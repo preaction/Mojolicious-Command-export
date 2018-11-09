@@ -125,6 +125,9 @@ sub run {
 
                     # Fix relative paths
                     my $path = $url =~ m{^/} ? $url : $dir->child( $url )."";
+                    # Remove fragment
+                    $path =~ s/#.+//;
+
                     if ( my $loc = $history{ $path }{ redirect_to } ) {
                         $el->attr( $attr => $loc );
                         next;

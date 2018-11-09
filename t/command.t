@@ -101,7 +101,7 @@ $cmd->run( '--base', '/base', '/' );
 ok -e $tmp->child( 'index.html' ), 'root exists';
 $dom = Mojo::DOM->new( $tmp->child( 'index.html' )->slurp );
 ok $dom->at( 'a[href=/base/docs]' ), 'absolute url (/docs) on / is rewritten';
-ok $dom->at( 'a[href=about]' ), 'relative url (about) on / is not rewritten';
+ok $dom->at( 'a[href=about#foo]' ), 'relative url (about) on / is not rewritten';
 
 ok -e $tmp->child( 'docs', 'index.html' ), '/docs exists (absolute link)';
 $dom = Mojo::DOM->new( $tmp->child( 'docs', 'index.html' )->slurp );
@@ -153,7 +153,7 @@ __DATA__
 <h1>Export</h1>
 <a href="http://mojolicious.org"><img src="logo-white-2x.png"></a>
 <a href="/docs">Absolute</a>
-<a href="about">Relative</a>
+<a href="about#foo">Relative</a>
 <a href="NOT_FOUND">Not found</a>
 <a href="/redirect">Redirect</a>
 
