@@ -2,6 +2,14 @@ Changelog for Mojolicious-Plugin-Export
 
 {{ $NEXT }}
 
+    [Fixed]
+
+    - Fixed "wide character in syswrite" by encoding HTML files to UTF-8.
+      If someone would like to be able to configure the file encoding,
+      that sounds like a good first patch for this project :)
+      This also does not encode plain text files or other files that
+      could be encoded (another good first patch for this project)
+
 0.003     2018-11-08 21:39:27-06:00 America/Chicago
 
     [Added]
