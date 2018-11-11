@@ -158,6 +158,15 @@ sub run {
 
 sub _write {
     my ( $self, $root, $page, $content ) = @_;
+    if ( ref $content eq 'Mojo::DOM' ) {
+        # Mojolicious automatically decodes using the response content
+        # type, so all we need to do is encode it into the file content
+        # type that we want
+        # TODO: Allow configuring the destination encoding
+        # TODO: Ensure all text/* MIME types use the destination
+        # encoding
+        $content = encode 'utf8', $content;
+    }
     my $to = $root->child( $page );
     if ( $to !~ m{[.][^/.]+$} ) {
         $to = $to->child( 'index.html' );

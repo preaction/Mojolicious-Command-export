@@ -12,6 +12,7 @@ L<Mojolicious::Command>, L<Mojolicious>
 use Mojo::Base -strict;
 use Test::More;
 use Mojo::File qw( path tempdir );
+use Mojo::Util qw( decode );
 use Mojo::DOM;
 use Mojolicious::Command::export;
 use Mojolicious;
@@ -23,10 +24,9 @@ $app->static->warmup;
 $app->routes->get( '/' )->name( 'index' );
 $app->routes->get( '/docs' )->name( 'docs' );
 $app->routes->get( '/docs/more' )->name( 'docs/more' )->to( cb => sub {
-    # UTF-8 encoding is busted. Need to examine encoding from
-    # content-type and decode/encode to destination type
-    #shift->render( inline => "<h1>\x{2603}</h1>" )
-    shift->render( inline => '<h1>More Docs</h1>' );
+    my ( $c ) = @_;
+    $c->res->headers->content_type( 'text/html;charset=UTF-8' );
+    $c->render( inline => "<h1>\x{2603}</h1>" );
 });
 $app->routes->get( '/about' )->name( 'about' );
 $app->routes->get( '/redirect' )->to( cb => sub {
@@ -55,9 +55,11 @@ ok -e $tmp->child( 'docs', 'index.html' ), '/docs exists (absolute link)';
 $dom = Mojo::DOM->new( $tmp->child( 'docs', 'index.html' )->slurp );
 is $dom->at( 'h1' ), '<h1>Docs</h1>', '/docs content is correct';
 
+# Test that HTML files are correctly encoded to UTF-8
 ok -e $tmp->child( 'docs', 'more', 'index.html' ), '/docs/more exists (relative link)';
-$dom = Mojo::DOM->new( $tmp->child( 'docs', 'more', 'index.html' )->slurp );
-is $dom->at( 'h1' ), "<h1>More Docs</h1>", '/docs/more content is correct';
+my $text = decode 'utf-8', $tmp->child( 'docs', 'more', 'index.html' )->slurp;
+$dom = Mojo::DOM->new( $text );
+is $dom->at( 'h1' ), "<h1>\x{2603}</h1>", '/docs/more content is correct';
 
 ok -e $tmp->child( 'about', 'index.html' ), '/about exists (relative link)';
 $dom = Mojo::DOM->new( $tmp->child( 'about', 'index.html' )->slurp );
