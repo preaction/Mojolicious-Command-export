@@ -2,6 +2,11 @@ Changelog for Mojolicious-Plugin-Export
 
 {{ $NEXT }}
 
+    [Added]
+
+    - Added Mojolicious::Plugin::Export to help with configuration and
+      allow exporting from other commands/plugins.
+
 0.004     2018-11-11 10:24:41-06:00 America/Chicago
 
     [Fixed]
