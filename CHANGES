@@ -6,6 +6,8 @@ Changelog for Mojolicious-Plugin-Export
 
     - Added Mojolicious::Plugin::Export to help with configuration and
       allow exporting from other commands/plugins.
+    - Added `before_write` event to allow for viewing/modifying content
+      before writing.
 
 0.004     2018-11-11 10:24:41-06:00 America/Chicago
 
