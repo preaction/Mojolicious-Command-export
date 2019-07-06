@@ -39,6 +39,25 @@ configuration using one of Mojolicious's configuration plugins.
 
 The C<export> helper returns the L<Mojolicious::Plugin::Export> object.
 
+=head1 EVENTS
+
+=head2 before_write
+
+Emitted after all the content has been loaded and prepared for export.
+The event is given two arguments: The Mojolicious::Plugin::Export object
+and a hashref of paths mapped to content to be exported. The content can
+be either a Mojo::DOM object for HTML pages or the content to be
+exported. This event may modify the hashref or the DOM objects to change
+the content before it is written.
+
+    app->export->on( before_write => sub {
+        my ( $export, $pages ) = @_;
+        for my $path ( keys %$pages ) {
+            my $content = $pages->{ $path };
+            # ...
+        }
+    } );
+
 =head1 SEE ALSO
 
 L<Mojolicious::Command::export>, L<Mojolicious::Plugin>
@@ -46,6 +65,7 @@ L<Mojolicious::Command::export>, L<Mojolicious::Plugin>
 =cut
 
 use Mojo::Base 'Mojolicious::Plugin';
+use Mojo::Base 'Mojo::EventEmitter';
 use Mojo::File qw( path );
 use Mojo::Util qw( encode decode );
 
@@ -198,14 +218,16 @@ sub export {
     # Event for checking the status of everything we're about to export.
     # We do this before rewriting the base URLs to make it easier to
     # check for broken links.
-    my @to_export =
-        map { [ $_->[0] => $_->[1] =~ m{^text/html} ? $_->[2]->dom : $_->[2]->body ] }
+    my %to_export =
+        map { $_->[0] => $_->[1] =~ m{^text/html} ? $_->[2]->dom : $_->[2]->body }
         map { [ $_, $history{ $_ }{ res }->headers->content_type, $history{ $_ }{ res } ] }
         grep { $history{ $_ }{ res } }
         keys %history;
 
-    for my $export ( @to_export ) {
-        my ( $page, $content ) = @$export;
+    $self->emit( before_write => \%to_export );
+
+    for my $page ( keys %to_export ) {
+        my $content = $to_export{ $page };
         if ( ref $content eq 'Mojo::DOM' ) {
             my $dir = path( $page )->dirname;
             for my $attr ( qw( href src ) ) {
