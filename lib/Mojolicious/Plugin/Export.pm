@@ -137,7 +137,7 @@ sub export {
     while ( my $page = shift @pages ) {
         next if $history{ $page }{ res };
         my $tx = $ua->get( $page );
-        my $res = $history{ $page }{ res } = $tx->res;
+        my $res = $tx->res;
 
         # Do not try to write error messages
         if ( $res->is_error ) {
@@ -151,20 +151,15 @@ sub export {
         # Rewrite links to redirects
         if ( $res->is_redirect ) {
             my $loc = $history{ $page }{ redirect_to } = $res->headers->location;
-            say "  [redir] Found redirect. Fixing links to this page"
-                unless $opt->{quiet};
             for my $link_from ( keys %{ $history{ $page }{ link_from } } ) {
                 for my $el ( @{ $history{ $page }{ link_from }{ $link_from } } ) {
                     $el->attr( href => $loc );
                 }
-                my $content = $history{ $link_from }{ res }->dom;
-                $self->_write( $root, $link_from, $content, $opt->{quiet} );
             }
             next;
         }
 
         my $type = $res->headers->content_type;
-        my $content = $tx->res->body;
         if ( $type and $type =~ m{^text/html} and my $dom = $res->dom ) {
             my $dir = path( $page )->dirname;
             for my $attr ( qw( href src ) ) {
@@ -193,6 +188,29 @@ sub export {
                         push @pages, $path;
                     }
 
+                }
+            }
+        }
+
+        $history{ $page }{ res } = $res;
+    }
+
+    # Event for checking the status of everything we're about to export.
+    # We do this before rewriting the base URLs to make it easier to
+    # check for broken links.
+    my @to_export =
+        map { [ $_->[0] => $_->[1] =~ m{^text/html} ? $_->[2]->dom : $_->[2]->body ] }
+        map { [ $_, $history{ $_ }{ res }->headers->content_type, $history{ $_ }{ res } ] }
+        grep { $history{ $_ }{ res } }
+        keys %history;
+
+    for my $export ( @to_export ) {
+        my ( $page, $content ) = @$export;
+        if ( ref $content eq 'Mojo::DOM' ) {
+            my $dir = path( $page )->dirname;
+            for my $attr ( qw( href src ) ) {
+                for my $el ( $content->find( "[$attr]" )->each ) {
+                    my $url = $el->attr( $attr );
                     # Rewrite absolute paths
                     if ( $opt->{base} && $url =~ m{^/} ) {
                         my $base_url = $url eq '/' ? $opt->{base} : $opt->{base} . $url;
@@ -200,9 +218,7 @@ sub export {
                     }
                 }
             }
-            $content = $dom;
         }
-
         $self->_write( $root, $page, $content, $opt->{quiet} );
     }
 }
