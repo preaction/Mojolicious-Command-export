@@ -2,6 +2,8 @@ Changelog for Mojolicious-Plugin-Export
 
 {{ $NEXT }}
 
+0.005     2019-07-06 18:41:58-05:00 America/Chicago
+
     [Added]
 
     - Added Mojolicious::Plugin::Export to help with configuration and

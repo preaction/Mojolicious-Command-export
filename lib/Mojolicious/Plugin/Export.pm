@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Export;
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 # ABSTRACT: Export a Mojolicious website to static files
 
 =head1 SYNOPSIS
