@@ -187,7 +187,7 @@ sub export {
                     my $url = $el->attr( $attr );
 
                     # Don't analyze full URLs
-                    next if $url =~ m{^(?:[a-zA-Z]+:)?//};
+                    next if $url =~ m{^(?:[a-zA-Z]+:|//)};
                     # Don't analyze in-page fragments
                     next if $url =~ m{^#};
 
