@@ -7,7 +7,7 @@ Mojolicious::Command::export - Export a Mojolicious website to static files
 
 # VERSION
 
-version 0.005
+version 0.006
 
 # SYNOPSIS
 
