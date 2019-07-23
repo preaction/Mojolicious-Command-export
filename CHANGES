@@ -2,6 +2,8 @@ Changelog for Mojolicious-Plugin-Export
 
 {{ $NEXT }}
 
+0.007     2019-07-22 22:20:46-05:00 America/Chicago
+
     [Fixed]
 
     - Fixed documentation using "paths" key instead of "pages". Using
