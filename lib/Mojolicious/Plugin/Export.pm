@@ -8,7 +8,7 @@ our $VERSION = '0.007';
     get '/' => 'index';
     get '/secret' => 'secret';
     plugin Export => {
-        paths => [qw( / /secret )],
+        pages => [qw( / /secret )],
     };
     app->start;
 
@@ -24,8 +24,8 @@ configuration using one of Mojolicious's configuration plugins.
     # myapp.conf
     {
         export => {
-            # Configure the default paths to export
-            paths => [ '/', '/hidden' ],
+            # Configure the default pages to export
+            pages => [ '/', '/hidden' ],
             # The directory to export to
             to => '/var/www/html',
             # Rewrite URLs to include base directory
@@ -115,6 +115,9 @@ sub register {
     # Config file overrides plugin config
     my $config = $app->can( 'config' ) ? $app->config->{export} : {};
     for my $key ( keys %$config ) {
+        if ( !$self->can( $key ) ) {
+            die "Unrecognized export configuration: $key\n";
+        }
         $self->$key( $config->{ $key } // $plugin_conf->{ $key } );
     }
 
