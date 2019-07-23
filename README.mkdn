@@ -7,7 +7,7 @@ Mojolicious::Command::export - Export a Mojolicious website to static files
 
 # VERSION
 
-version 0.006
+version 0.007
 
 # SYNOPSIS
 
@@ -35,8 +35,8 @@ configuration using one of Mojolicious's configuration plugins.
     # myapp.conf
     {
         export => {
-            # Configure the default paths to export
-            paths => [ '/', '/hidden' ],
+            # Configure the default pages to export
+            pages => [ '/', '/hidden' ],
             # The directory to export to
             to => '/var/www/html',
             # Rewrite URLs to include base directory
