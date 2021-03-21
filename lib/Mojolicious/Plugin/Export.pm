@@ -184,7 +184,7 @@ sub export {
 
         my $type = $res->headers->content_type;
         if ( $type and $type =~ m{^text/html} and my $dom = $res->dom ) {
-            my $dir = path( $page )->dirname;
+            my $dir = $page =~ m{/$} ? path( $page ) : path( $page )->dirname;
             for my $attr ( qw( href src ) ) {
                 for my $el ( $dom->find( "[$attr]" )->each ) {
                     my $url = $el->attr( $attr );
