@@ -2,6 +2,8 @@ Changelog for Mojolicious-Plugin-Export
 
 {{ $NEXT }}
 
+0.008     2021-03-21 15:45:15-05:00 America/Chicago
+
     [Fixed]
 
     - Fixed URLs ending with `/` being rewritten to remove the trailing
