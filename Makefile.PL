@@ -12,10 +12,10 @@ my %WriteMakefileArgs = (
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
-  "DISTNAME" => "Mojolicious-Command-export",
+  "DISTNAME" => "Mojolicious-Plugin-Export",
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.014",
-  "NAME" => "Mojolicious::Command::export",
+  "NAME" => "Mojolicious::Plugin::Export",
   "PREREQ_PM" => {
     "Mojolicious" => 8
   },

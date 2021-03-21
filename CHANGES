@@ -2,6 +2,14 @@ Changelog for Mojolicious-Plugin-Export
 
 {{ $NEXT }}
 
+    [Fixed]
+
+    - Fixed URLs ending with `/` being rewritten to remove the trailing
+      slash. If the URL is a directory, the web server will then
+      redirect the user back to the URL with a trailing `/` so that
+      relative URLs on the default directory page will work. Leaving the
+      `/` removes the need for a redirect.
+
 0.007     2019-07-22 22:20:46-05:00 America/Chicago
 
     [Fixed]

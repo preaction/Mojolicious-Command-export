@@ -1,31 +1,27 @@
-[![Build Status](https://travis-ci.org/preaction/Mojolicious-Command-export.svg?branch=master)](https://travis-ci.org/preaction/Mojolicious-Command-export)
-[![Coverage Status](https://coveralls.io/repos/preaction/Mojolicious-Command-export/badge.svg?branch=master)](https://coveralls.io/r/preaction/Mojolicious-Command-export?branch=master)
+[![Build Status](https://travis-ci.org/preaction/Mojolicious-Plugin-Export.svg?branch=master)](https://travis-ci.org/preaction/Mojolicious-Plugin-Export)
+[![Coverage Status](https://coveralls.io/repos/preaction/Mojolicious-Plugin-Export/badge.svg?branch=master)](https://coveralls.io/r/preaction/Mojolicious-Plugin-Export?branch=master)
 
 # NAME
 
-Mojolicious::Command::export - Export a Mojolicious website to static files
+Mojolicious::Plugin::Export - Export a Mojolicious website to static files
 
 # VERSION
 
-version 0.007
+version 0.008
 
 # SYNOPSIS
 
-    Usage: APPLICATION export [OPTIONS] [PAGES]
-
-      ./myapp.pl export
-      ./myapp.pl export /perldoc --to /var/www/html
-      ./myapp.pl export /perldoc --base /url
-
-    Options:
-      -h, --help        Show this summary of available options
-          --to <path>   Path to store the static pages. Defaults to '.'.
-          --base <url>  Rewrite internal absolute links to prepend base
-      -q, --quiet       Silence report of dirs/files modified
+    use Mojolicious::Lite;
+    get '/' => 'index';
+    get '/secret' => 'secret';
+    plugin Export => {
+        pages => [qw( / /secret )],
+    };
+    app->start;
 
 # DESCRIPTION
 
-Export a Mojolicious webapp to static files.
+Deploy a Mojolicious webapp to static files.
 
 ## Configuration
 
@@ -44,9 +40,65 @@ configuration using one of Mojolicious's configuration plugins.
         }
     }
 
+# ATTRIBUTES
+
+## pages
+
+The pages to export by default. This can be overridden by the arguments to
+["export"](#export).
+
+    # Add pages to export by default
+    push @{ $app->export->pages }, '/blog';
+
+## to
+
+The path to export to by default.
+
+## base
+
+The base URL, if URLs need to be rewritten.
+
+## quiet
+
+If true, will not report every action taken by the plugin. Defaults to true.
+
+# METHODS
+
+## export
+
+    app->export->export( $override );
+
+Export the site. `$override` is a hash reference to override the object
+attributes (keys are attribute names, values are the overridden value).
+
+# HELPERS
+
+## export
+
+The `export` helper returns the [Mojolicious::Plugin::Export](https://metacpan.org/pod/Mojolicious::Plugin::Export) object.
+
+# EVENTS
+
+## before\_write
+
+Emitted after all the content has been loaded and prepared for export.
+The event is given two arguments: The Mojolicious::Plugin::Export object
+and a hashref of paths mapped to content to be exported. The content can
+be either a Mojo::DOM object for HTML pages or the content to be
+exported. This event may modify the hashref or the DOM objects to change
+the content before it is written.
+
+    app->export->on( before_write => sub {
+        my ( $export, $pages ) = @_;
+        for my $path ( keys %$pages ) {
+            my $content = $pages->{ $path };
+            # ...
+        }
+    } );
+
 # SEE ALSO
 
-[Mojolicious](https://metacpan.org/pod/Mojolicious), [Mojolicious::Commands](https://metacpan.org/pod/Mojolicious::Commands)
+[Mojolicious::Command::export](https://metacpan.org/pod/Mojolicious::Command::export), [Mojolicious::Plugin::Export::Git](https://metacpan.org/pod/Mojolicious::Plugin::Export::Git), [Mojolicious::Plugin](https://metacpan.org/pod/Mojolicious::Plugin)
 
 # AUTHOR
 
