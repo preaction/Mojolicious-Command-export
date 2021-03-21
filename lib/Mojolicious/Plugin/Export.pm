@@ -60,7 +60,7 @@ the content before it is written.
 
 =head1 SEE ALSO
 
-L<Mojolicious::Command::export>, L<Mojolicious::Plugin>
+L<Mojolicious::Command::export>, L<Mojolicious::Plugin::Export::Git>, L<Mojolicious::Plugin>
 
 =cut
 
