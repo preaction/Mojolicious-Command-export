@@ -14,7 +14,7 @@ our $VERSION = '0.008';
 
 =head1 DESCRIPTION
 
-Export a Mojolicious webapp to static files.
+Deploy a Mojolicious webapp to static files.
 
 =head2 Configuration
 
